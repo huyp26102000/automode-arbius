@@ -64,6 +64,7 @@ function updateAutoclaimEnable() {
 }
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
+  console.log(msg)
   const getStatus = async () => {
     const resp = await axios.get(`${CORE_URL}/status`);
     const data = resp?.data;
