@@ -114,140 +114,141 @@ const processAutomate = async () => {
     const resp = await axios.get(`${process.env.CORE_URL}/auto/status`);
     const configf = resp.data;
     const nodestatus = await fetchNode();
-    if (
-      realReward >= +configf.autoclaim.thresshold &&
-      claimGas <= +configf.autoclaim.limitgas
-    ) {
+    if (configf?.autoclaim?.enable) {
       if (
-        configf?.autoclaim?.enable &&
-        nodestatus.filter((e) => e?.claim == true)?.length != nodestatus?.length
+        realReward >= +configf.autoclaim.thresshold &&
+        claimGas <= +configf.autoclaim.limitgas
       ) {
-        console.log("run claim", realReward);
-        // await axios.get(
-        //   `${process.env.CORE_URL}/update?action=claim&address=${e}`
-        // );
-        await Promise.all(
-          listnode.map(async (e) => {
-            await axios.get(
-              `${process.env.CORE_URL}/update?action=claim&address=${e}`
-            );
-          })
-        );
-        await axios({
-          baseURL: `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`,
-          url: "/sendMessage",
-          method: "post",
-          data: {
-            chat_id: process.env.TELEGRAM_CHAT_ID,
-            text: `@hiro_trk\nAUTO claim Triggered\nReward: <b>${realReward}</b>\nGas <b>${claimGas}</b>`,
-            message_thread_id: "24670",
-            parse_mode: "html",
-            disable_web_page_preview: true,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            "cache-control": "no-cache",
-            "Access-Control-Allow-Origin": "*",
-          },
-        });
-      } else console.log("Already running");
-    } else {
-      if (
-        configf?.autoclaim?.enable &&
-        nodestatus.filter((e) => e?.claim == false)?.length !=
+        if (
+          nodestatus.filter((e) => e?.claim == true)?.length !=
           nodestatus?.length
-      ) {
-        console.log("run stop claim", realReward);
-        await Promise.all(
-          listnode.map(async (e) => {
-            await axios.get(
-              `${process.env.CORE_URL}/update?action=stopclaim&address=${e}`
-            );
-          })
-        );
-        await axios({
-          baseURL: `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`,
-          url: "/sendMessage",
-          method: "post",
-          data: {
-            chat_id: process.env.TELEGRAM_CHAT_ID,
-            text: `@hiro_trk\nAUTO stop claim Triggered\nReward: <b>${realReward}</b>\nGas <b>${claimGas}</b>`,
-            message_thread_id: "24670",
-            parse_mode: "html",
-            disable_web_page_preview: true,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            "cache-control": "no-cache",
-            "Access-Control-Allow-Origin": "*",
-          },
-        });
+        ) {
+          console.log("run claim", realReward);
+          // await axios.get(
+          //   `${process.env.CORE_URL}/update?action=claim&address=${e}`
+          // );
+          await Promise.all(
+            listnode.map(async (e) => {
+              await axios.get(
+                `${process.env.CORE_URL}/update?action=claim&address=${e}`
+              );
+            })
+          );
+          await axios({
+            baseURL: `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`,
+            url: "/sendMessage",
+            method: "post",
+            data: {
+              chat_id: process.env.TELEGRAM_CHAT_ID,
+              text: `@hiro_trk\nAUTO claim Triggered\nReward: <b>${realReward}</b>\nGas <b>${claimGas}</b>`,
+              message_thread_id: "24670",
+              parse_mode: "html",
+              disable_web_page_preview: true,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "cache-control": "no-cache",
+              "Access-Control-Allow-Origin": "*",
+            },
+          });
+        } else console.log("Already running");
       } else {
-        console.log("Already stop");
+        if (
+          nodestatus.filter((e) => e?.claim == false)?.length !=
+          nodestatus?.length
+        ) {
+          console.log("run stop claim", realReward);
+          await Promise.all(
+            listnode.map(async (e) => {
+              await axios.get(
+                `${process.env.CORE_URL}/update?action=stopclaim&address=${e}`
+              );
+            })
+          );
+          await axios({
+            baseURL: `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`,
+            url: "/sendMessage",
+            method: "post",
+            data: {
+              chat_id: process.env.TELEGRAM_CHAT_ID,
+              text: `@hiro_trk\nAUTO stop claim Triggered\nReward: <b>${realReward}</b>\nGas <b>${claimGas}</b>`,
+              message_thread_id: "24670",
+              parse_mode: "html",
+              disable_web_page_preview: true,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "cache-control": "no-cache",
+              "Access-Control-Allow-Origin": "*",
+            },
+          });
+        } else {
+          console.log("Already stop");
+        }
       }
     }
-    if (automineGas <= configf?.automine?.limitgas) {
-      if (
-        configf?.autoclaim?.enable &&
-        nodestatus.filter((e) => e["start-automine"] == true)?.length !=
+    if (configf?.autoclaim?.enable) {
+      if (automineGas <= configf?.automine?.limitgas) {
+        if (
+          nodestatus.filter((e) => e["start-automine"] == true)?.length !=
           nodestatus?.length
-      ) {
-        await Promise.all(
-          listnode.map(async (e) => {
-            await axios.get(
-              `${process.env.CORE_URL}/update?action=automine&address=${e}`
-            );
-          })
-        );
-        await axios({
-          baseURL: `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`,
-          url: "/sendMessage",
-          method: "post",
-          data: {
-            chat_id: process.env.TELEGRAM_CHAT_ID,
-            text: `@hiro_trk\nAUTO automine Triggered\nGas: <b>${automineGas}</b>\nLimit <b>${configf?.automine?.limitgas}</b>`,
-            message_thread_id: "24670",
-            parse_mode: "html",
-            disable_web_page_preview: true,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            "cache-control": "no-cache",
-            "Access-Control-Allow-Origin": "*",
-          },
-        });
-      } else console.log("Already automine");
-    } else {
-      if (
-        configf?.autoclaim?.enable &&
-        nodestatus.filter((e) => e["start-automine"] == false)?.length !=
+        ) {
+          await Promise.all(
+            listnode.map(async (e) => {
+              await axios.get(
+                `${process.env.CORE_URL}/update?action=automine&address=${e}`
+              );
+            })
+          );
+          await axios({
+            baseURL: `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`,
+            url: "/sendMessage",
+            method: "post",
+            data: {
+              chat_id: process.env.TELEGRAM_CHAT_ID,
+              text: `@hiro_trk\nAUTO automine Triggered\nGas: <b>${automineGas}</b>\nLimit <b>${configf?.automine?.limitgas}</b>`,
+              message_thread_id: "24670",
+              parse_mode: "html",
+              disable_web_page_preview: true,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "cache-control": "no-cache",
+              "Access-Control-Allow-Origin": "*",
+            },
+          });
+        } else console.log("Already automine");
+      } else {
+        if (
+          nodestatus.filter((e) => e["start-automine"] == false)?.length !=
           nodestatus?.length
-      ) {
-        await Promise.all(
-          listnode.map(async (e) => {
-            await axios.get(
-              `${process.env.CORE_URL}/update?action=stopall&address=${e}`
-            );
-          })
-        );
-        await axios({
-          baseURL: `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`,
-          url: "/sendMessage",
-          method: "post",
-          data: {
-            chat_id: process.env.TELEGRAM_CHAT_ID,
-            text: `@hiro_trk\nAUTO stop automine Triggered\nGas: <b>${automineGas}</b>\nLimit <b>${configf?.automine?.limitgas}</b>`,
-            message_thread_id: "24670",
-            parse_mode: "html",
-            disable_web_page_preview: true,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            "cache-control": "no-cache",
-            "Access-Control-Allow-Origin": "*",
-          },
-        });
-      } else console.log("Already stop automine");
+        ) {
+          await Promise.all(
+            listnode.map(async (e) => {
+              await axios.get(
+                `${process.env.CORE_URL}/update?action=stopall&address=${e}`
+              );
+            })
+          );
+          await axios({
+            baseURL: `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`,
+            url: "/sendMessage",
+            method: "post",
+            data: {
+              chat_id: process.env.TELEGRAM_CHAT_ID,
+              text: `@hiro_trk\nAUTO stop automine Triggered\nGas: <b>${automineGas}</b>\nLimit <b>${configf?.automine?.limitgas}</b>`,
+              message_thread_id: "24670",
+              parse_mode: "html",
+              disable_web_page_preview: true,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "cache-control": "no-cache",
+              "Access-Control-Allow-Origin": "*",
+            },
+          });
+        } else console.log("Already stop automine");
+      }
     }
   } catch (error) {
     console.log(error);
