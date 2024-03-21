@@ -93,13 +93,13 @@ const fetchNode = async () => {
 };
 const processAutomate = async () => {
   try {
-    // const gasFee = await fetchPrice();
-    const gasFee = {
-      submitTask: "0.00000345520339",
-      claimSolution: "0.0000023949633",
-      submitSolution: "0.00000332364359",
-      signalCommitment: "0.00000104491963",
-    };
+    const gasFee = await fetchPrice();
+    // const gasFee = {
+    //   submitTask: "0.00000345520339",
+    //   claimSolution: "0.0000023949633",
+    //   submitSolution: "0.00000332364359",
+    //   signalCommitment: "0.00000104491963",
+    // };
     const reward = await fetchReward();
     const realReward = reward * 0.9;
     const ethPrice = await getEthPrice();
