@@ -187,7 +187,7 @@ const processAutomate = async () => {
         }
       }
     }
-    if (configf?.autoclaim?.enable) {
+    if (configf?.automine?.enable) {
       if (automineGas <= configf?.automine?.limitgas) {
         if (
           nodestatus.filter((e) => e["start-automine"] == true)?.length !=

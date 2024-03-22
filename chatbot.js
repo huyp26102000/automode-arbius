@@ -4,7 +4,7 @@ const TelegramBot = require("node-telegram-bot-api");
 require("dotenv").config();
 const listNode = JSON.parse(process.env.NODE_URL);
 
-const bot = new TelegramBot("6723022602:AAFIxxvopAaEq5d2cNcX0d5zKprbz31BnAI", {
+const bot = new TelegramBot("6839460963:AAHHW36aba_hWjO3MlmHyZW7AZgHu2BAkyU", {
   polling: true,
 });
 const CORE_URL = `https://miner-manager-tg0l.onrender.com`;
