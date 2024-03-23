@@ -1,12 +1,23 @@
 const { default: axios } = require("axios");
 const { readFile, writeFile, readFileSync } = require("fs");
 const TelegramBot = require("node-telegram-bot-api");
+const { fetchUnclaim } = require("./utils/unclaim");
+const { Wallet, ethers, Contract } = require("ethers");
+const EngineABI = require("./V2_EngineV2.json");
 require("dotenv").config();
 const listNode = JSON.parse(process.env.NODE_URL);
 
-const bot = new TelegramBot("6839460963:AAHHW36aba_hWjO3MlmHyZW7AZgHu2BAkyU", {
+const bot = new TelegramBot("6723022602:AAFIxxvopAaEq5d2cNcX0d5zKprbz31BnAI", {
   polling: true,
 });
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+const wallet = new Wallet(process.env.SCRAPT_WALLET, provider);
+const arbius = new Contract(
+  "0x3BF6050327Fa280Ee1B5F3e8Fd5EA2EfE8A6472a",
+  EngineABI,
+  wallet
+);
+
 const CORE_URL = `https://miner-manager-tg0l.onrender.com`;
 let actions = [];
 const addAction = async (msg) => {
@@ -64,7 +75,7 @@ function updateAutoclaimEnable() {
 }
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
-  console.log(msg)
+  console.log(msg);
   const getStatus = async () => {
     const resp = await axios.get(`${CORE_URL}/status`);
     const data = resp?.data;
@@ -113,6 +124,27 @@ Gas: <code>${data?.automine?.limitgas}</code>`,
   const supportedMethod = ["claim", "automine"];
   const supportedParams = ["gas", "thresshold"];
   switch (params[0]) {
+    case "/unclaim":
+      (async () => {
+        await bot.sendMessage(chatId, "Loading...");
+        const listData = await fetchUnclaim(arbius, wallet);
+        bot.sendMessage(
+          chatId,
+          `Unclaim Task
+${listData
+  .map(
+    (obj, index) => `<b>${addressShortener(
+      ["0xDDfb3eE2E3801fb53BB0Df20E2A8bFdda0186858"][index]
+    )}</b> ${obj}
+`
+  )
+  .join("")}`,
+          {
+            parse_mode: "HTML",
+          }
+        );
+      })();
+      break;
     case "/config":
       (async () => {
         switch (params?.length) {

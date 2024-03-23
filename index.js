@@ -2,9 +2,10 @@ const { default: axios } = require("axios");
 const { ethers } = require("ethers");
 const EngineABI = require("./V2_EngineV2.json");
 const cron = require("node-cron");
+const { formatEther } = require("ethers/lib/utils");
 require("dotenv").config();
 const listnode = JSON.parse(process.env.NODE_URL);
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
 const arbiusContract = new ethers.Contract(
   "0x3BF6050327Fa280Ee1B5F3e8Fd5EA2EfE8A6472a",
   EngineABI,
@@ -56,7 +57,7 @@ const fetchPrice = async () => {
           (el) => el.functionName.includes(method) && el.isError == "0"
         );
         if (submiskTask?.gasUsed)
-          data[method] = ethers.formatEther(
+          data[method] = formatEther(
             submiskTask.gasUsed * rs?.data?.result?.[0]?.gasPrice
           );
       });
@@ -69,7 +70,7 @@ const fetchPrice = async () => {
 const fetchReward = async () => {
   try {
     const reward = await arbiusContract.getReward();
-    return ethers.formatEther(reward);
+    return formatEther(reward);
   } catch (error) {}
 };
 async function getEthPrice() {
