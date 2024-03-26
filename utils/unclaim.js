@@ -55,7 +55,7 @@ const scanTask = async (arbius, targetAddress, startBlock, endBlock) => {
 };
 const fetchUnclaim = async (arbius, wallet, targetAddress) => {
   const currentBlock = +(await wallet.provider.getBlockNumber());
-  let lastScanBlock = +currentBlock - 100;
+  let lastScanBlock = +currentBlock - 1400000;
   return scanTask(arbius, targetAddress, lastScanBlock, currentBlock);
 };
 
