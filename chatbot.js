@@ -127,21 +127,11 @@ Gas: <code>${data?.automine?.limitgas}</code>`,
     case "/unclaim":
       (async () => {
         await bot.sendMessage(chatId, "Loading...");
-        const listData = await fetchUnclaim(arbius, wallet);
+        const data = await fetchUnclaim(arbius, wallet, params[1]);
         bot.sendMessage(
           chatId,
           `Unclaim Task
-${listData
-  .map(
-    (obj, index) => `<b>${addressShortener(
-      ["0xDDfb3eE2E3801fb53BB0Df20E2A8bFdda0186858"][index]
-    )}</b> ${obj}
-`
-  )
-  .join("")}`,
-          {
-            parse_mode: "HTML",
-          }
+${addressShortener(params[1])} ${data}`
         );
       })();
       break;
