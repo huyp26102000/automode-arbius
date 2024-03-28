@@ -1,9 +1,10 @@
 const { default: axios } = require("axios");
-const { readFile, writeFile, readFileSync } = require("fs");
+const { readFile, writeFile, readFileSync, writeFileSync } = require("fs");
 const TelegramBot = require("node-telegram-bot-api");
 const { fetchUnclaim } = require("./utils/unclaim");
 const { Wallet, ethers, Contract } = require("ethers");
-const EngineABI = require("./V2_EngineV2.json");
+const EngineABI = require("./contracts/V2_EngineV2.json");
+const { OFFER_JSON_URL } = require("./constants");
 require("dotenv").config();
 const listNode = JSON.parse(process.env.NODE_URL);
 
@@ -17,6 +18,16 @@ const arbius = new Contract(
   EngineABI,
   wallet
 );
+let offers = [];
+(async () => {
+  try {
+    const rawOffers = readFileSync(OFFER_JSON_URL, "utf-8");
+    offers = JSON.parse(rawOffers);
+  } catch (error) {
+    console.log(error);
+    writeFileSync(OFFER_JSON_URL, "[]");
+  }
+})();
 
 const CORE_URL = `https://miner-manager-tg0l.onrender.com`;
 let actions = [];
@@ -124,6 +135,36 @@ Gas: <code>${data?.automine?.limitgas}</code>`,
   const supportedMethod = ["claim", "automine"];
   const supportedParams = ["gas", "thresshold"];
   switch (params[0]) {
+    case "/order":
+      (async () => {
+        if (params?.length == 5) {
+          await queueOffer(params[1], params[2], params[3], params[4]);
+        }
+      })();
+      break;
+    case "/help":
+      bot.sendMessage(
+        chatId,
+        `<code></code>
+<code>/config claim thresshold 0.0010</code>
+<code>/config claim gas 0.012</code>
+<code>/config automine off</code>
+<code>/config claim on</code>
+<code>/config claim off</code>
+<code>/unclaim 0xDDfb3eE2E3801fb53BB0Df20E2A8bFdda0186858</code>
+/config
+/status
+/mine
+/automine
+/stopall
+/claim
+/stopclaim
+/config`,
+        {
+          parse_mode: "HTML",
+        }
+      );
+      break;
     case "/unclaim":
       (async () => {
         await bot.sendMessage(chatId, "Loading...");

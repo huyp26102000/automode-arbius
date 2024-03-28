@@ -1,6 +1,6 @@
 const { default: axios } = require("axios");
 const { ethers } = require("ethers");
-const EngineABI = require("./V2_EngineV2.json");
+const EngineABI = require("./contracts/V2_EngineV2.json");
 const cron = require("node-cron");
 const { formatEther } = require("ethers/lib/utils");
 require("dotenv").config();
